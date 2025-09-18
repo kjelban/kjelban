@@ -25,9 +25,10 @@ Civil Engineer (Construction Division)
 
 ## 🛠 Skills & Tools
 
-![VB.NET](https://img.shields.io/badge/VB.NET-5C2D91?style=flat&logo=.net&logoColor=white) (≈80%)  
-![Python](https://img.shields.io/badge/Python-FFD43B?style=flat&logo=python&logoColor=darkgreen) (≈60%)  
-![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=c%2B%2B&logoColor=white) (≈40%)  
+![VB.NET](https://img.shields.io/badge/VB.NET-5C2D91?style=flat&logo=.net&logoColor=white)
+![Python](https://img.shields.io/badge/Python-FFD43B?style=flat&logo=python&logoColor=darkgreen)
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=c%2B%2B&logoColor=white)
+![VBA](https://img.shields.io/badge/VBA-217346?style=flat&logo=microsoft-excel&logoColor=white)
 
 **Other Tools & Knowledge:**  
 - Structural design software (Concrete design focus)  
