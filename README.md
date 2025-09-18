@@ -44,3 +44,13 @@ Civil Engineer (Construction Division)
 - Exploring **C++** fundamentals  
 
 ---
+
+## 👨‍💻 About Me
+
+- 🏗️ Civil Engineer specialized in **Construction**
+- 💻 Passionate about **programming** and building small applications
+- 🔧 Strong in **VB.NET (≈80%)**, with good knowledge of **Python (≈60%)** and **C++ (≈40%)**
+- 📊 Experience with **VBA** for automating tasks in Microsoft Office
+- 🧮 Familiar with **structural design software**, especially concrete design tools
+- 🌱 Currently learning more about **software development** and **automation**
+- 📂 Interested in mixing **engineering** with **coding** to create practical solutions
