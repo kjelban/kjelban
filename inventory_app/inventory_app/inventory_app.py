@@ -49,7 +49,6 @@ def setup_database():
     ''')
 
     # Items Table
-    # Now uses foreign keys for category and unit
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,9 +87,25 @@ class InventoryApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("نظام إدارة مخزن كلية العلوم والتقنية")
-        self.geometry("1200x800")
+        
+        # جعل النافذة ملء الشاشة
+        self.state('zoomed')  # للويندوز
+        # أو استخدم:
+        # self.attributes('-zoomed', True)  # للينكس
+        
+        # إعدادات الخطوط
+        self.large_font = ('Arial', 14, 'bold')
+        self.medium_font = ('Arial', 12)
+        self.small_font = ('Arial', 10)
+        
         self.style = ttk.Style(self)
         self.style.theme_use('clam')
+        
+        # تكوين خطوط العناوين
+        self.style.configure('TNotebook.Tab', font=self.large_font, padding=[20, 10])
+        self.style.configure('TLabel', font=self.medium_font)
+        self.style.configure('TButton', font=self.medium_font, padding=[10, 5])
+        self.style.configure('Treeview.Heading', font=self.medium_font)
 
         # Create a notebook (tabbed interface)
         self.notebook = ttk.Notebook(self)
@@ -146,8 +161,8 @@ class InventoryApp(tk.Tk):
         cards_frame.pack(fill='x', pady=(0, 20))
 
         self.style.configure('Card.TFrame', background='#f0f0f0', relief='raised', borderwidth=1)
-        self.style.configure('CardTitle.TLabel', font=('Helvetica', 12, 'bold'), background='#f0f0f0')
-        self.style.configure('CardValue.TLabel', font=('Helvetica', 24, 'bold'), background='#f0f0f0')
+        self.style.configure('CardTitle.TLabel', font=self.large_font, background='#f0f0f0')
+        self.style.configure('CardValue.TLabel', font=('Arial', 20, 'bold'), background='#f0f0f0')
 
         self.create_card(cards_frame, "إجمالي الأصناف", self.get_total_items, 0)
         self.create_card(cards_frame, "الأصناف منخفضة المخزون", self.get_low_stock_items, 1)
@@ -169,11 +184,11 @@ class InventoryApp(tk.Tk):
         activity_container.pack(side='right', fill='both', expand=True)
 
         self.activity_tree = ttk.Treeview(activity_container, columns=('Date', 'Type', 'Item', 'Qty', 'Employee'), show='headings', height=10)
-        self.activity_tree.heading('Date', text='التاريخ')
-        self.activity_tree.heading('Type', text='النوع')
-        self.activity_tree.heading('Item', text='المادة')
-        self.activity_tree.heading('Qty', text='الكمية')
-        self.activity_tree.heading('Employee', text='الموظف')
+        self.activity_tree.heading('Date', text='التاريخ', font=self.medium_font)
+        self.activity_tree.heading('Type', text='النوع', font=self.medium_font)
+        self.activity_tree.heading('Item', text='المادة', font=self.medium_font)
+        self.activity_tree.heading('Qty', text='الكمية', font=self.medium_font)
+        self.activity_tree.heading('Employee', text='الموظف', font=self.medium_font)
         
         self.activity_tree.column('Date', width=120)
         self.activity_tree.column('Type', width=80, anchor='center')
@@ -187,11 +202,11 @@ class InventoryApp(tk.Tk):
         card.grid(row=0, column=column, padx=10, pady=10, sticky="nsew")
         parent.grid_columnconfigure(column, weight=1)
 
-        title_label = ttk.Label(card, text=title, style='CardTitle.TLabel')
+        title_label = ttk.Label(card, text=title, style='CardTitle.TLabel', font=self.large_font)
         title_label.pack()
         
         value = command_func(**kwargs)
-        value_label = ttk.Label(card, text=str(value), style='CardValue.TLabel')
+        value_label = ttk.Label(card, text=str(value), style='CardValue.TLabel', font=('Arial', 20, 'bold'))
         value_label.pack()
 
     def get_total_items(self):
@@ -290,8 +305,8 @@ class InventoryApp(tk.Tk):
         form_frame = ttk.LabelFrame(self.units_frame, text="إضافة/تعديل وحدة")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="اسم الوحدة:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.unit_name_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="اسم الوحدة:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.unit_name_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.unit_name_entry.grid(row=0, column=1, padx=5, pady=5)
         
         self.unit_id_var = tk.StringVar()
@@ -307,8 +322,8 @@ class InventoryApp(tk.Tk):
         tree_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.units_tree = ttk.Treeview(tree_frame, columns=('ID', 'Name'), show='headings')
-        self.units_tree.heading('ID', text='الرقم')
-        self.units_tree.heading('Name', text='اسم الوحدة')
+        self.units_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.units_tree.heading('Name', text='اسم الوحدة', font=self.medium_font)
         self.units_tree.column('ID', width=50, anchor='center')
         self.units_tree.pack(fill='both', expand=True)
         self.units_tree.bind('<Double-1>', self.load_unit_data)
@@ -402,14 +417,13 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'item_unit_combobox'):
             self.refresh_item_comboboxes()
 
-
     # --- Categories Tab ---
     def create_categories_tab(self):
         form_frame = ttk.LabelFrame(self.categories_frame, text="إضافة/تعديل فئة")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="اسم الفئة:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.category_name_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="اسم الفئة:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.category_name_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.category_name_entry.grid(row=0, column=1, padx=5, pady=5)
         
         self.category_id_var = tk.StringVar()
@@ -425,8 +439,8 @@ class InventoryApp(tk.Tk):
         tree_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.categories_tree = ttk.Treeview(tree_frame, columns=('ID', 'Name'), show='headings')
-        self.categories_tree.heading('ID', text='الرقم')
-        self.categories_tree.heading('Name', text='اسم الفئة')
+        self.categories_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.categories_tree.heading('Name', text='اسم الفئة', font=self.medium_font)
         self.categories_tree.column('ID', width=50, anchor='center')
         self.categories_tree.pack(fill='both', expand=True)
         self.categories_tree.bind('<Double-1>', self.load_category_data)
@@ -522,30 +536,29 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'chart_ax'):
             self.update_overview_chart()
 
-
     # --- Items Tab ---
     def create_items_tab(self):
         form_frame = ttk.LabelFrame(self.items_frame, text="إضافة/تعديل صنف")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="اسم الصنف:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.item_name_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="اسم الصنف:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.item_name_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.item_name_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="الوصف:").grid(row=1, column=0, padx=5, pady=5, sticky='w')
-        self.item_desc_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="الوصف:", font=self.medium_font).grid(row=1, column=0, padx=5, pady=5, sticky='w')
+        self.item_desc_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.item_desc_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="الكمية:").grid(row=2, column=0, padx=5, pady=5, sticky='w')
-        self.item_qty_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="الكمية:", font=self.medium_font).grid(row=2, column=0, padx=5, pady=5, sticky='w')
+        self.item_qty_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.item_qty_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="الفئة:").grid(row=3, column=0, padx=5, pady=5, sticky='w')
-        self.item_category_combobox = ttk.Combobox(form_frame, state="readonly", width=38)
+        ttk.Label(form_frame, text="الفئة:", font=self.medium_font).grid(row=3, column=0, padx=5, pady=5, sticky='w')
+        self.item_category_combobox = ttk.Combobox(form_frame, state="readonly", width=38, font=self.medium_font)
         self.item_category_combobox.grid(row=3, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="الوحدة:").grid(row=4, column=0, padx=5, pady=5, sticky='w')
-        self.item_unit_combobox = ttk.Combobox(form_frame, state="readonly", width=38)
+        ttk.Label(form_frame, text="الوحدة:", font=self.medium_font).grid(row=4, column=0, padx=5, pady=5, sticky='w')
+        self.item_unit_combobox = ttk.Combobox(form_frame, state="readonly", width=38, font=self.medium_font)
         self.item_unit_combobox.grid(row=4, column=1, padx=5, pady=5)
         
         self.item_id_var = tk.StringVar()
@@ -561,12 +574,12 @@ class InventoryApp(tk.Tk):
         tree_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.items_tree = ttk.Treeview(tree_frame, columns=('ID', 'Name', 'Description', 'Quantity', 'Category', 'Unit'), show='headings')
-        self.items_tree.heading('ID', text='الرقم')
-        self.items_tree.heading('Name', text='اسم الصنف')
-        self.items_tree.heading('Description', text='الوصف')
-        self.items_tree.heading('Quantity', text='الكمية')
-        self.items_tree.heading('Category', text='الفئة')
-        self.items_tree.heading('Unit', text='الوحدة')
+        self.items_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.items_tree.heading('Name', text='اسم الصنف', font=self.medium_font)
+        self.items_tree.heading('Description', text='الوصف', font=self.medium_font)
+        self.items_tree.heading('Quantity', text='الكمية', font=self.medium_font)
+        self.items_tree.heading('Category', text='الفئة', font=self.medium_font)
+        self.items_tree.heading('Unit', text='الوحدة', font=self.medium_font)
 
         self.items_tree.column('ID', width=40, anchor='center')
         self.items_tree.column('Quantity', width=80, anchor='center')
@@ -602,7 +615,6 @@ class InventoryApp(tk.Tk):
         # Also refresh transaction combobox
         if hasattr(self, 'trans_item_combobox'):
             self.refresh_comboboxes()
-
 
     def add_item(self):
         name = self.item_name_entry.get()
@@ -740,18 +752,17 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'trans_item_combobox'):
             self.refresh_comboboxes()
 
-
     # --- Suppliers Tab ---
     def create_suppliers_tab(self):
         form_frame = ttk.LabelFrame(self.suppliers_frame, text="إضافة مورد")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="اسم المورد:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.supplier_name_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="اسم المورد:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.supplier_name_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.supplier_name_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="معلومات الاتصال:").grid(row=1, column=0, padx=5, pady=5, sticky='w')
-        self.supplier_contact_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="معلومات الاتصال:", font=self.medium_font).grid(row=1, column=0, padx=5, pady=5, sticky='w')
+        self.supplier_contact_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.supplier_contact_entry.grid(row=1, column=1, padx=5, pady=5)
 
         ttk.Button(form_frame, text="إضافة مورد", command=self.add_supplier).grid(row=2, column=0, columnspan=2, pady=10)
@@ -760,9 +771,9 @@ class InventoryApp(tk.Tk):
         tree_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.suppliers_tree = ttk.Treeview(tree_frame, columns=('ID', 'Name', 'Contact'), show='headings')
-        self.suppliers_tree.heading('ID', text='الرقم')
-        self.suppliers_tree.heading('Name', text='اسم المورد')
-        self.suppliers_tree.heading('Contact', text='معلومات الاتصال')
+        self.suppliers_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.suppliers_tree.heading('Name', text='اسم المورد', font=self.medium_font)
+        self.suppliers_tree.heading('Contact', text='معلومات الاتصال', font=self.medium_font)
         self.suppliers_tree.column('ID', width=50, anchor='center')
         self.suppliers_tree.pack(fill='both', expand=True)
         
@@ -802,18 +813,17 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'trans_supplier_combobox'):
             self.refresh_comboboxes()
 
-
     # --- Employees Tab ---
     def create_employees_tab(self):
         form_frame = ttk.LabelFrame(self.employees_frame, text="إضافة موظف")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="اسم الموظف:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.employee_name_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="اسم الموظف:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.employee_name_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.employee_name_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="المنصب:").grid(row=1, column=0, padx=5, pady=5, sticky='w')
-        self.employee_position_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="المنصب:", font=self.medium_font).grid(row=1, column=0, padx=5, pady=5, sticky='w')
+        self.employee_position_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.employee_position_entry.grid(row=1, column=1, padx=5, pady=5)
 
         ttk.Button(form_frame, text="إضافة موظف", command=self.add_employee).grid(row=2, column=0, columnspan=2, pady=10)
@@ -822,9 +832,9 @@ class InventoryApp(tk.Tk):
         tree_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.employees_tree = ttk.Treeview(tree_frame, columns=('ID', 'Name', 'Position'), show='headings')
-        self.employees_tree.heading('ID', text='الرقم')
-        self.employees_tree.heading('Name', text='اسم الموظف')
-        self.employees_tree.heading('Position', text='المنصب')
+        self.employees_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.employees_tree.heading('Name', text='اسم الموظف', font=self.medium_font)
+        self.employees_tree.heading('Position', text='المنصب', font=self.medium_font)
         self.employees_tree.column('ID', width=50, anchor='center')
         self.employees_tree.pack(fill='both', expand=True)
 
@@ -864,13 +874,12 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'trans_employee_combobox'):
             self.refresh_comboboxes()
 
-
     # --- Transactions Tab ---
     def create_transactions_tab(self):
         type_frame = ttk.Frame(self.transactions_frame)
         type_frame.pack(pady=10)
         
-        ttk.Label(type_frame, text="نوع الحركة:", font=('Helvetica', 12, 'bold')).pack(side='left', padx=10)
+        ttk.Label(type_frame, text="نوع الحركة:", font=self.large_font).pack(side='left', padx=10)
         self.transaction_type_var = tk.StringVar(value="RECEIVE")
         ttk.Radiobutton(type_frame, text="استلام مواد", variable=self.transaction_type_var, value="RECEIVE", command=self.toggle_supplier_field).pack(side='left', padx=10)
         ttk.Radiobutton(type_frame, text="تسليم مواد", variable=self.transaction_type_var, value="ISSUE", command=self.toggle_supplier_field).pack(side='left', padx=10)
@@ -878,25 +887,25 @@ class InventoryApp(tk.Tk):
         form_frame = ttk.LabelFrame(self.transactions_frame, text="تسجيل حركة جديدة")
         form_frame.pack(padx=10, pady=10, fill='x')
 
-        ttk.Label(form_frame, text="المادة:").grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.trans_item_combobox = ttk.Combobox(form_frame, state="readonly", width=37)
+        ttk.Label(form_frame, text="المادة:", font=self.medium_font).grid(row=0, column=0, padx=5, pady=5, sticky='w')
+        self.trans_item_combobox = ttk.Combobox(form_frame, state="readonly", width=37, font=self.medium_font)
         self.trans_item_combobox.grid(row=0, column=1, padx=5, pady=5)
         
-        ttk.Label(form_frame, text="الكمية:").grid(row=1, column=0, padx=5, pady=5, sticky='w')
-        self.trans_qty_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="الكمية:", font=self.medium_font).grid(row=1, column=0, padx=5, pady=5, sticky='w')
+        self.trans_qty_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.trans_qty_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="الموظف:").grid(row=2, column=0, padx=5, pady=5, sticky='w')
-        self.trans_employee_combobox = ttk.Combobox(form_frame, state="readonly", width=37)
+        ttk.Label(form_frame, text="الموظف:", font=self.medium_font).grid(row=2, column=0, padx=5, pady=5, sticky='w')
+        self.trans_employee_combobox = ttk.Combobox(form_frame, state="readonly", width=37, font=self.medium_font)
         self.trans_employee_combobox.grid(row=2, column=1, padx=5, pady=5)
 
-        self.trans_supplier_label = ttk.Label(form_frame, text="المورد:")
+        self.trans_supplier_label = ttk.Label(form_frame, text="المورد:", font=self.medium_font)
         self.trans_supplier_label.grid(row=3, column=0, padx=5, pady=5, sticky='w')
-        self.trans_supplier_combobox = ttk.Combobox(form_frame, state="readonly", width=37)
+        self.trans_supplier_combobox = ttk.Combobox(form_frame, state="readonly", width=37, font=self.medium_font)
         self.trans_supplier_combobox.grid(row=3, column=1, padx=5, pady=5)
 
-        ttk.Label(form_frame, text="ملاحظات/السبب:").grid(row=4, column=0, padx=5, pady=5, sticky='w')
-        self.trans_notes_entry = ttk.Entry(form_frame, width=40)
+        ttk.Label(form_frame, text="ملاحظات/السبب:", font=self.medium_font).grid(row=4, column=0, padx=5, pady=5, sticky='w')
+        self.trans_notes_entry = ttk.Entry(form_frame, width=40, font=self.medium_font)
         self.trans_notes_entry.grid(row=4, column=1, padx=5, pady=5)
         
         ttk.Button(form_frame, text="تسجيل الحركة", command=self.record_transaction).grid(row=5, column=0, columnspan=2, pady=10)
@@ -905,14 +914,14 @@ class InventoryApp(tk.Tk):
         history_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
         self.transactions_tree = ttk.Treeview(history_frame, columns=('ID', 'Date', 'Type', 'Item', 'Qty', 'Employee', 'Supplier', 'Notes'), show='headings')
-        self.transactions_tree.heading('ID', text='الرقم')
-        self.transactions_tree.heading('Date', text='التاريخ')
-        self.transactions_tree.heading('Type', text='النوع')
-        self.transactions_tree.heading('Item', text='المادة')
-        self.transactions_tree.heading('Qty', text='الكمية')
-        self.transactions_tree.heading('Employee', text='الموظف')
-        self.transactions_tree.heading('Supplier', text='المورد')
-        self.transactions_tree.heading('Notes', text='ملاحظات')
+        self.transactions_tree.heading('ID', text='الرقم', font=self.medium_font)
+        self.transactions_tree.heading('Date', text='التاريخ', font=self.medium_font)
+        self.transactions_tree.heading('Type', text='النوع', font=self.medium_font)
+        self.transactions_tree.heading('Item', text='المادة', font=self.medium_font)
+        self.transactions_tree.heading('Qty', text='الكمية', font=self.medium_font)
+        self.transactions_tree.heading('Employee', text='الموظف', font=self.medium_font)
+        self.transactions_tree.heading('Supplier', text='المورد', font=self.medium_font)
+        self.transactions_tree.heading('Notes', text='ملاحظات', font=self.medium_font)
 
         self.transactions_tree.column('ID', width=40, anchor='center')
         self.transactions_tree.column('Qty', width=60, anchor='center')
@@ -1013,7 +1022,6 @@ class InventoryApp(tk.Tk):
         if hasattr(self, 'activity_tree'):
             self.update_recent_activity()
 
-
     def refresh_transactions_tree(self):
         for i in self.transactions_tree.get_children():
             self.transactions_tree.delete(i)
@@ -1038,7 +1046,6 @@ class InventoryApp(tk.Tk):
             type_ar = "استلام" if row[2] == 'RECEIVE' else "تسليم"
             self.transactions_tree.insert('', 'end', values=(row[0], row[1], type_ar, row[3], row[4], row[5], row[6] or '-', row[7] or '-'))
         conn.close()
-
 
 # --- Main Execution ---
 if __name__ == "__main__":
